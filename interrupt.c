@@ -20,7 +20,8 @@ void interrupt low_priority LISR(){
     uint8_t ErrCounterY = 0;
     uint8_t i;
     uint8_t Buf[10];
-    uint16_t u1, u2;
+    uint16_t U1, U2;
+    uint32_t U = 1000; // В качестве опоры 1кОм 0,5% резисторы.
 
     if(TMR1IF && TMR1IE){
         TMR1IF = 0;
@@ -80,26 +81,28 @@ void interrupt low_priority LISR(){
             switch(ErrCounterX + ErrCounterY){
                 case 0:
                 case 1:
-                    Rez = 0.0;
+                    //                    Rez = 0.0;
                     TMR1ON = 0; // Обновление индикации выключено
                     break;
                 case 2:
+                    // Сопротивление = ((u1 - u2) / u2) * 1000 Rоп
                     // В стенде реализованна импровизированная четырёхпроводная схема измерения
-                    u1 = AdcMeasData[AdcChData[0]];
-                    u2 = AdcMeasData[AdcChData[1]];
-                    if(u1 > u2){
-                        Rez2 = (u1 - u2) / (float) u2;
-                        Rez2 *= 1000; // В качестве опоры 1кОм 0,5% резисторы.
+                    U1 = AdcMeasData[AdcChData[0]];
+                    U2 = AdcMeasData[AdcChData[1]];
+                    if(U1 > U2){
+                        U *= (U1 - U2);
                     } else{
-                        Rez2 = (u2 - u1) / (float) u1;
-                        Rez2 *= 1000; // В качестве опоры 1кОм 0,5% резисторы.
+                        U *= (U2 - U1);
                     }
+                    Rez2 = U / (float) U2;
+
                     // Ускорение вычисленя усреднения
-                    if(Rez == 0.0){
-                        Rez = Rez2;
-                    }
+                    //                    if(Rez == 0.0){
+                    //                        Rez = Rez2;
+                    //                    }
                     // Усреднение
-                    Rez = (Rez * (1.0 - 0.1)) + (Rez2 * 0.1);
+#define Filter 0.1
+                    Rez = ((Rez * (1.0 - Filter)) + (Rez2 * Filter));
                     TMR1ON = 1; // Обновление индикации включено
                     break;
                 default:
