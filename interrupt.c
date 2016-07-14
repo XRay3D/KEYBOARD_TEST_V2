@@ -13,35 +13,44 @@ void interrupt high_priority HISR(){
     }
 }
 
-void interrupt low_priority LISR(){
-    static float Rez = 0.0;
-    float Rez2;
-    uint8_t ErrCounterX = 0;
-    uint8_t ErrCounterY = 0;
-    uint8_t i;
-    uint8_t Buf[10];
-    uint16_t U1, U2;
-    uint32_t U = 1000; // В качестве опоры 1кОм 0,5% резисторы.
+static float Rez = 0.0;
+static bool BtnPressed = false;
+float Rez2;
+uint8_t ErrCounterX = 0;
+uint8_t ErrCounterY = 0;
+uint8_t i, BlinkCounter, PresCounter = 0;
+uint8_t Buf[10];
+uint16_t U1, U2;
 
+void interrupt low_priority LISR(){
+    uint32_t U = 1000; // В качестве опоры 1кОм 0,5% резисторы.
     if(TMR1IF && TMR1IE){
         TMR1IF = 0;
-        if(Rez > 300){
-            UpdateLedColor(255);
-        } else if(Rez > 45){
-            UpdateLedColor(Rez - 45);
+        if(BtnPressed){
+            if(Rez > 300){
+                UpdateLedColor(255);
+            } else if(Rez > 45){
+                UpdateLedColor(Rez - 45);
+            } else{
+                UpdateLedColor(0);
+            }
+            if(Rez < 10){
+                sprintf(Buf, "  %.1f", Rez);
+            } else if(Rez < 100){
+                sprintf(Buf, " %.1f", Rez);
+            } else if(Rez < 1000){
+                sprintf(Buf, "%.1f", Rez);
+            } else{
+                sprintf(Buf, "%u", (uint32_t) Rez);
+            }
+            UpdateLedData(Buf);
         } else{
-            UpdateLedColor(0);
+            if(++BlinkCounter & 0x10){
+                UpdateLedData("    ");
+            } else{
+                UpdateLedData(Buf);
+            }
         }
-        if(Rez < 10){
-            sprintf(Buf, "  %.1f", Rez);
-        } else if(Rez < 100){
-            sprintf(Buf, " %.1f", Rez);
-        } else if(Rez < 1000){
-            sprintf(Buf, "%.1f", Rez);
-        } else{
-            sprintf(Buf, "%u", (uint32_t) Rez);
-        }
-        UpdateLedData(Buf);
     }
     if(TMR2IF && TMR2IE){
         TMR2IF = 0;
@@ -81,10 +90,16 @@ void interrupt low_priority LISR(){
             switch(ErrCounterX + ErrCounterY){
                 case 0:
                 case 1:
-                    //                    Rez = 0.0;
-                    TMR1ON = 0; // Обновление индикации выключено
+                    if(PresCounter > 30){// 2 круга опроса
+                        BtnPressed = false;
+                    } else{
+                        ++PresCounter;
+                    }
+                    // Rez = 0.0;
                     break;
                 case 2:
+                    BtnPressed = true;
+                    PresCounter = 0;
                     // Сопротивление = ((u1 - u2) / u2) * 1000 Rоп
                     // В стенде реализованна импровизированная четырёхпроводная схема измерения
                     U1 = AdcMeasData[AdcChData[0]];
@@ -97,11 +112,11 @@ void interrupt low_priority LISR(){
                     Rez2 = U / (float) U2;
 
                     // Ускорение вычисленя усреднения
-                    //                    if(Rez == 0.0){
-                    //                        Rez = Rez2;
-                    //                    }
+                    // if(Rez == 0.0){
+                    //     Rez = Rez2;
+                    // }
                     // Усреднение
-#define Filter 0.1
+#define Filter 0.05
                     Rez = ((Rez * (1.0 - Filter)) + (Rez2 * Filter));
                     TMR1ON = 1; // Обновление индикации включено
                     break;
