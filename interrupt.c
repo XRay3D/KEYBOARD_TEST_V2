@@ -23,7 +23,7 @@ uint8_t Buf[10];
 uint16_t U1, U2;
 
 void interrupt low_priority LISR(){
-    uint32_t U = 1000; // В качестве опоры 1кОм 0,5% резисторы.
+    uint32_t U = 1000; // Р’ РєР°С‡РµСЃС‚РІРµ РѕРїРѕСЂС‹ 1РєРћРј 0,5% СЂРµР·РёСЃС‚РѕСЂС‹.
     if(TMR1IF && TMR1IE){
         TMR1IF = 0;
         if(BtnPressed){
@@ -67,7 +67,7 @@ void interrupt low_priority LISR(){
         AdcMeasData[AdcCh] = ADRES;
         if(++AdcCh == 14){
             AdcCh = 0;
-            // Сканирование Шины Х на наличие утечек и КЗ
+            // РЎРєР°РЅРёСЂРѕРІР°РЅРёРµ РЁРёРЅС‹ РҐ РЅР° РЅР°Р»РёС‡РёРµ СѓС‚РµС‡РµРє Рё РљР—
             for(ErrCounterX = 0, i = 0; i < 8; ++i){
                 if(AdcMeasData[i] > 15){
                     AdcChData[ErrCounterX++] = i;
@@ -77,7 +77,7 @@ void interrupt low_priority LISR(){
                     i = 8;
                 }
             }
-            // Сканирование Шины У на наличие утечек и КЗ
+            // РЎРєР°РЅРёСЂРѕРІР°РЅРёРµ РЁРёРЅС‹ РЈ РЅР° РЅР°Р»РёС‡РёРµ СѓС‚РµС‡РµРє Рё РљР—
             for(ErrCounterY = 0, i = 8; i < 14; ++i){
                 if(AdcMeasData[i] > 15){
                     AdcChData[ErrCounterX + ErrCounterY++] = i;
@@ -90,18 +90,16 @@ void interrupt low_priority LISR(){
             switch(ErrCounterX + ErrCounterY){
                 case 0:
                 case 1:
-                    if(PresCounter > 30){// 2 круга опроса
+                    if(PresCounter > 30){// 2 РєСЂСѓРіР° РѕРїСЂРѕСЃР°
                         BtnPressed = false;
+                        Rez = 0.0;
                     } else{
                         ++PresCounter;
                     }
-                    // Rez = 0.0;
                     break;
                 case 2:
-                    BtnPressed = true;
-                    PresCounter = 0;
-                    // Сопротивление = ((u1 - u2) / u2) * 1000 Rоп
-                    // В стенде реализованна импровизированная четырёхпроводная схема измерения
+                    // РЎРѕРїСЂРѕС‚РёРІР»РµРЅРёРµ RРєРЅ = ((U1 - U2) / U2) * 1000 RРѕРї
+                    // Р’ СЃС‚РµРЅРґРµ СЂРµР°Р»РёР·РѕРІР°РЅРЅР° РёРјРїСЂРѕРІРёР·РёСЂРѕРІР°РЅРЅР°СЏ С‡РµС‚С‹СЂС‘С…РїСЂРѕРІРѕРґРЅР°СЏ СЃС…РµРјР° РёР·РјРµСЂРµРЅРёСЏ
                     U1 = AdcMeasData[AdcChData[0]];
                     U2 = AdcMeasData[AdcChData[1]];
                     if(U1 > U2){
@@ -110,15 +108,15 @@ void interrupt low_priority LISR(){
                         U *= (U2 - U1);
                     }
                     Rez2 = U / (float) U2;
+                    if(!BtnPressed){
+                        BtnPressed = true;
+                        PresCounter = 0;
+                        Rez = Rez2; // РЈСЃРєРѕСЂРµРЅРёРµ РІС‹С‡РёСЃР»РµРЅСЏ СѓСЃСЂРµРґРЅРµРЅРёСЏ
+                    }
 
-                    // Ускорение вычисленя усреднения
-                    // if(Rez == 0.0){
-                    //     Rez = Rez2;
-                    // }
-                    // Усреднение
 #define Filter 0.05
-                    Rez = ((Rez * (1.0 - Filter)) + (Rez2 * Filter));
-                    TMR1ON = 1; // Обновление индикации включено
+                    Rez = ((Rez * (1.0 - Filter)) + (Rez2 * Filter)); // РЈСЃСЂРµРґРЅРµРЅРёРµ
+                    TMR1ON = 1; // РћР±РЅРѕРІР»РµРЅРёРµ РёРЅРґРёРєР°С†РёРё РІРєР»СЋС‡РµРЅРѕ
                     break;
                 default:
                     UpdateLedColor(255);
@@ -132,7 +130,7 @@ void interrupt low_priority LISR(){
                         UpdateLedData("E3");
                     }
                     Rez = 0.0;
-                    TMR1ON = 0; // Обновление индикации выключено
+                    TMR1ON = 0; // РћР±РЅРѕРІР»РµРЅРёРµ РёРЅРґРёРєР°С†РёРё РІС‹РєР»СЋС‡РµРЅРѕ
                     break;
             }
             UpdatePins();
@@ -140,7 +138,8 @@ void interrupt low_priority LISR(){
         TMR2ON = 1;
     }
 }
-// Функции необходимые для #include <stdio.h>
+
+// Р¤СѓРЅРєС†РёРё РЅРµРѕР±С…РѕРґРёРјС‹Рµ РґР»СЏ #include <stdio.h>
 
 char getch(void){
     while(!RC1IF){
