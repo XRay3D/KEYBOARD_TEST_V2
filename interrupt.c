@@ -14,7 +14,7 @@ void interrupt high_priority HISR(){
 }
 
 static float Rez = 0.0;
-static bool BtnPressed = false;
+static bool BtnPressed = true;
 float Rez2;
 uint8_t ErrCounterX = 0;
 uint8_t ErrCounterY = 0;
