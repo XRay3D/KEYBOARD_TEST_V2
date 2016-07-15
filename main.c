@@ -18,8 +18,8 @@ void main(void){
     PIE1bits.ADIE = 1;
     IPR1bits.ADIP = 0;
 
+    T1CON = 0x21;
     TMR1ON = 1;
-    T1CON = 0x11;
     PIE1bits.TMR1IE = 1;
     IPR1bits.TMR1IP = 0;
 

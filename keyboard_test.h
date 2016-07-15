@@ -26,5 +26,4 @@ extern "C" {
 }
 #endif /* __cplusplus */
 
-#endif	/* KEYBOARD_TEST */
-
+#endif /* KEYBOARD_TEST */

@@ -45,7 +45,7 @@ void interrupt low_priority LISR(){
             }
             UpdateLedData(Buf);
         } else{
-            if(++BlinkCounter & 0x10){
+            if(++BlinkCounter & 0x08){
                 UpdateLedData("    ");
             } else{
                 UpdateLedData(Buf);
@@ -98,6 +98,7 @@ void interrupt low_priority LISR(){
                     }
                     break;
                 case 2:
+                    PresCounter = 0;
                     // Сопротивление Rкн = ((U1 - U2) / U2) * 1000 Rоп
                     // В стенде реализованна импровизированная четырёхпроводная схема измерения
                     U1 = AdcMeasData[AdcChData[0]];
@@ -110,7 +111,6 @@ void interrupt low_priority LISR(){
                     Rez2 = U / (float) U2;
                     if(!BtnPressed){
                         BtnPressed = true;
-                        PresCounter = 0;
                         Rez = Rez2; // Ускорение вычисленя усреднения
                     }
 

@@ -11,5 +11,4 @@ extern "C" {
 }
 #endif /* __cplusplus */
 
-#endif	/* INTERRUPT */
-
+#endif /* INTERRUPT */

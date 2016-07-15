@@ -1,4 +1,3 @@
-
 // PIC18F8720 Configuration Bit Settings
 
 // 'C' source line config statements

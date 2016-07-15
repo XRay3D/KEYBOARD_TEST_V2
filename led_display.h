@@ -43,5 +43,4 @@ extern "C" {
 }
 #endif /* __cplusplus */
 
-#endif	/* LED_DISPLAY */
-
+#endif /* LED_DISPLAY */

@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 //#include <math.h>
 
 #include "led_display.h"
@@ -22,5 +23,4 @@ extern "C" {
 }
 #endif /* __cplusplus */
 
-#endif	/* COMMON_HEADER */
-
+#endif /* COMMON_HEADER */

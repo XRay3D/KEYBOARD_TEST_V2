@@ -14,7 +14,7 @@ const uint8_t RedSeg [] = {
     RedA | RedB | RedC | RedD | RedE | RedF | RedG, // 	8
     RedA | RedB | RedC | RedD | RedF | RedG, // 	9
     RedG, // 	-10
-    0, // 	пробел11
+    0, // 	РїСЂРѕР±РµР»11
     RedA | RedD | RedE | RedF | RedG, // 	E12
     RedE | RedG, // 	r13
 };
@@ -31,7 +31,7 @@ const uint8_t GreenSeg [] = {
     GreenA | GreenB | GreenC | GreenD | GreenE | GreenF | GreenG, // 	8
     GreenA | GreenB | GreenC | GreenD | GreenF | GreenG, // 	9
     GreenG, // 	-10
-    0, // 	пробел11
+    0, // 	РїСЂРѕР±РµР»11
     GreenA | GreenD | GreenE | GreenF | GreenG, // 	E12
     GreenE | GreenG, // 	r13
 };
